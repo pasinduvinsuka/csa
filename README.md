@@ -6,10 +6,10 @@ This is a REST API built with JAX-RS (Jersey) and Grizzly for managing smart cam
 
 The API is structured around the main resources:
 
-- **/api/v1**                          - Discovery endpoint
-- **/api/v1/rooms**                    - Manage rooms (CRUD)
-- **/api/v1/rooms/{roomId}**           - Manage a single room
-- **/api/v1/sensors**                  - Manage sensors (CRUD and filtering)
+- **/api/v1** - Discovery endpoint
+- **/api/v1/rooms** - Manage rooms (CRUD)
+- **/api/v1/rooms/{roomId}** - Manage a single room
+- **/api/v1/sensors** - Manage sensors (CRUD and filtering)
 - **/api/v1/sensors/{sensorId}/readings** - Manage readings for a specific sensor
 
 ### Design Choices
@@ -38,10 +38,10 @@ smart-campus-api/
 ├── pom.xml                          # Maven configuration
 ├── README.md                        # Readme
 └── src/main/java/com/smartcampus/
-    ├── Main.java                    # Entry point 
+    ├── Main.java                    # Entry point
     ├── SmartCampusApplication.java  # JAX-RS Application config (@ApplicationPath)
     ├── data/
-    │   └── DataStore.java           
+    │   └── DataStore.java
     ├── models/
     │   ├── Room.java                # Room POJO
     │   ├── Sensor.java              # Sensor POJO
@@ -63,20 +63,24 @@ smart-campus-api/
         └── RequestResponseLoggingFilter.java         # Request/Response logging filter
 ```
 
-
 ## How to Build and Run
 
 ### Prerequisites
+
 - JDK 21
 - Maven
 
+## Run in Terminal
+
 ### Step 1: Clone the Repository
+
 ```bash
 git clone https://github.com/pasinduvinsuka/csa.git
 cd csa
 ```
 
 ### Step 2: Build the Project
+
 ```bash
 mvn clean compile
 ```
@@ -84,23 +88,48 @@ mvn clean compile
 ### Step 3: Launch the Server
 
 **Using Maven:**
+
 ```bash
 mvn exec:java
 ```
 
 ### Step 4: Verify
+
 Once it is running, you can test it by going to `http://localhost:8080/api/v1/` in your browser.
 
 ---
 
+## Run in NetBeans (JDK 21)
+
+### 1. Open the Project
+
+1. Launch NetBeans.
+2. Go to **File > Open Project**.
+3. Navigate to the project folder.
+4. Select it and click 
+5. **Open Project**.
+
+### 2. Build and Download Dependencies
+
+1. Right-click the project.
+2. Select **Clean and Build**.
+3. Check the **Output** window and confirm it ends with `BUILD SUCCESS`.
+
+### 4. Run the API
+
+1. Right-click the project.
+2. Select **Run**.
+
 ## Sample curl Commands
 
 ### 1. Get API Metadata
+
 ```bash
 curl -X GET http://localhost:8080/api/v1/
 ```
 
 **Expected Response:**
+
 ```json
 {
   "status": 200,
@@ -118,6 +147,7 @@ curl -X GET http://localhost:8080/api/v1/
 ```
 
 ### 2. Create a Room
+
 ```bash
 curl -X POST http://localhost:8080/api/v1/rooms \
   -H "Content-Type: application/json" \
@@ -125,6 +155,7 @@ curl -X POST http://localhost:8080/api/v1/rooms \
 ```
 
 **Expected Response:**
+
 ```json
 {
   "status": 201,
@@ -139,6 +170,7 @@ curl -X POST http://localhost:8080/api/v1/rooms \
 ```
 
 ### 3. Register a Sensor
+
 ```bash
 curl -X POST http://localhost:8080/api/v1/sensors \
   -H "Content-Type: application/json" \
@@ -146,6 +178,7 @@ curl -X POST http://localhost:8080/api/v1/sensors \
 ```
 
 **Expected Response:**
+
 ```json
 {
   "status": 201,
@@ -161,6 +194,7 @@ curl -X POST http://localhost:8080/api/v1/sensors \
 ```
 
 ### 4. Post a Sensor Reading
+
 ```bash
 curl -X POST http://localhost:8080/api/v1/sensors/TEMP-001/readings \
   -H "Content-Type: application/json" \
@@ -168,6 +202,7 @@ curl -X POST http://localhost:8080/api/v1/sensors/TEMP-001/readings \
 ```
 
 **Expected Response:**
+
 ```json
 {
   "status": 201,
@@ -181,11 +216,13 @@ curl -X POST http://localhost:8080/api/v1/sensors/TEMP-001/readings \
 ```
 
 ### 5. Filter Sensors by Type
+
 ```bash
 curl -X GET "http://localhost:8080/api/v1/sensors?type=Temperature"
 ```
 
 **Expected Response:**
+
 ```json
 {
   "status": 200,
@@ -203,11 +240,13 @@ curl -X GET "http://localhost:8080/api/v1/sensors?type=Temperature"
 ```
 
 ### 6. Delete a Room with Sensors (Error Case)
+
 ```bash
 curl -X DELETE http://localhost:8080/api/v1/rooms/LIB-301
 ```
 
 **Expected Response:**
+
 ```json
 {
   "status": 409,
@@ -217,6 +256,7 @@ curl -X DELETE http://localhost:8080/api/v1/rooms/LIB-301
 ```
 
 ### 7. Register a Sensor with Invalid Room ID (Error Case)
+
 ```bash
 curl -X POST http://localhost:8080/api/v1/sensors \
   -H "Content-Type: application/json" \
@@ -224,6 +264,7 @@ curl -X POST http://localhost:8080/api/v1/sensors \
 ```
 
 **Expected Response:**
+
 ```json
 {
   "status": 422,
@@ -257,9 +298,9 @@ Yes. Idempotent implies that it can be done only once or several times and the r
 **Q1: Consequences of Sending Non-JSON Data with @Consumes(APPLICATION_JSON) :**
 When a client post data other than `application/json`, such as plain text or XML, JAX-RS will notice it does not match `application/json` and will automatically block it. Before the code in the method even executes, it results in a 415 Unsupported Media Type error.
 
-
 **Q2: @QueryParam vs. Path-Based Filtering :**
 Using query parameters (like `?type=CO2`) is better for filtering because:
+
 - They are optional. The same endpoint works with or without them.
 - Client can easily combine multiple filters.
 - In REST, URL paths should identify resources, while query parameters are meant for filtering those resources.
@@ -279,4 +320,3 @@ If we show stack traces to users, attackers can see exactly what versions of Jav
 
 **Q3 (section 5): Why Use JAX-RS Filters for Logging? :**
 Filtering involves having to write the logging code only once, and then it is automatically applied to all requests and responses. Without the filter we would have to copy and paste `Logger.info()` into each individual method, which is not very tidy and forgettable.
-
